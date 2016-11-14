@@ -1,5 +1,7 @@
 package org.launchcode.blogz.controllers;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -21,8 +23,41 @@ public class AuthenticationController extends AbstractController {
 	public String signup(HttpServletRequest request, Model model) {
 		
 		// TODO - implement signup
+		String username = request.getParameter("username");
+		String password = request.getParameter("password");
+		String verify = request.getParameter("verify");
 		
-		return "redirect:blog/newpost";
+		boolean hasError = false;
+		
+		if (!(User.isValidUsername(username))){
+			hasError = true;
+			model.addAttribute("username_error", "Invalid Username");
+		}
+
+		List<User> users = userDao.findAll();
+		for (User u : users){
+			if (u.getUsername().equals(username)){
+				hasError = true;
+				model.addAttribute("username_error", "Username already exists");
+			}
+		}
+		
+		if (!(User.isValidPassword(password))){
+			hasError = true;
+			model.addAttribute("password_error", "Invalid Password");
+		} else if (password != verify){
+			hasError = true;
+			model.addAttribute("verify_error", "Passwords do not match");
+		}
+		
+		if (hasError == true)
+			return "signup";
+		
+		User u = new User(username, password);
+		userDao.save(u);
+		setUserInSession(request.getSession(), u);
+			
+;		return "redirect:blog/newpost";
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -34,6 +69,20 @@ public class AuthenticationController extends AbstractController {
 	public String login(HttpServletRequest request, Model model) {
 		
 		// TODO - implement login
+		String username = request.getParameter("username");
+		String password = request.getParameter("password");
+		
+		User u = userDao.findByUsername(username);
+		
+		if (u == null){
+			model.addAttribute("error", "User does not exist");
+			return "login";
+		} else if (!(u.isMatchingPassword(password))){
+			model.addAttribute("error", "Incorrect Password");
+			return "login";
+		}
+		
+		setUserInSession(request.getSession(), u);
 		
 		return "redirect:blog/newpost";
 	}
