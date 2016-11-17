@@ -45,7 +45,7 @@ public class PostController extends AbstractController {
 		postDao.save(p);
 		model.addAttribute("post", p);
 		
-		return "redirect:post"; // TODO - this redirect should go to the new post's page  		
+		return "post"; // TODO - this redirect should go to the new post's page  		
 	}
 	
 	@RequestMapping(value = "/blog/{username}/{uid}", method = RequestMethod.GET)

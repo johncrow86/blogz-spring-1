@@ -29,7 +29,7 @@ public class AuthenticationController extends AbstractController {
 		
 		boolean hasError = false;
 		
-		if (!(User.isValidUsername(username))){
+		if (!User.isValidUsername(username)){
 			hasError = true;
 			model.addAttribute("username_error", "Invalid Username");
 		}
@@ -42,10 +42,10 @@ public class AuthenticationController extends AbstractController {
 			}
 		}
 		
-		if (!(User.isValidPassword(password))){
+		if (!User.isValidPassword(password)){
 			hasError = true;
 			model.addAttribute("password_error", "Invalid Password");
-		} else if (password != verify){
+		} else if (!password.equals(verify)){
 			hasError = true;
 			model.addAttribute("verify_error", "Passwords do not match");
 		}
@@ -77,7 +77,7 @@ public class AuthenticationController extends AbstractController {
 		if (u == null){
 			model.addAttribute("error", "User does not exist");
 			return "login";
-		} else if (!(u.isMatchingPassword(password))){
+		} else if (!u.isMatchingPassword(password)){
 			model.addAttribute("error", "Incorrect Password");
 			return "login";
 		}
